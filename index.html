@@ -142,7 +142,7 @@
       <button class="copy-btn" data-copy="p1a" onclick="copyCode('p1a')">⧉ Copy</button>
       <pre id="p1a">
 %{
-#include<stdio.h>
+#include&lt;stdio.h&gt;
 int lines=1, spaces=0, words=0, characters=0;
 %}
 %%
@@ -192,8 +192,8 @@ int main(){
       <button class="copy-btn" data-copy="p1b_y" onclick="copyCode('p1b_y')">⧉ Copy</button>
       <pre id="p1b_y">
 %{
-#include<stdio.h>
-#include<string.h>
+#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
 void yyerror(char const *s);
 %}
 %start S
@@ -228,7 +228,7 @@ void yyerror(char const *s){
       <button class="copy-btn" data-copy="p2a" onclick="copyCode('p2a')">⧉ Copy</button>
       <pre id="p2a">
 %{
-#include<stdio.h>
+#include&lt;stdio.h&gt;
 int nf=0,pf=0,p=0,n=0;
 %}
 %%
@@ -284,8 +284,8 @@ extern YYSTYPE yylval;
       <button class="copy-btn" data-copy="p2b_y" onclick="copyCode('p2b_y')">⧉ Copy</button>
       <pre id="p2b_y">
 %{
-#include<stdio.h>
-#include<stdlib.h>
+#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
 void yyerror(const char *s);
 int yylex(void);
 %}
@@ -362,8 +362,8 @@ int yywrap(){ return 1; }
       <button class="copy-btn" data-copy="p3a_y" onclick="copyCode('p3a_y')">⧉ Copy</button>
       <pre id="p3a_y">
 %{
-#include <stdio.h>
-#include <stdlib.h>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 int yylex();
 int count = 0;
 int yyerror();
@@ -439,8 +439,8 @@ int yywrap(){ return 1; }
       <button class="copy-btn" data-copy="p3b_y" onclick="copyCode('p3b_y')">⧉ Copy</button>
       <pre id="p3b_y">
 %{
-#include <stdio.h>
-#include <stdlib.h>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 int var_count = 0;
 void yyerror(const char *s);
 int yylex();
@@ -502,8 +502,8 @@ int yywrap(){ return 1; }
       <button class="copy-btn" data-copy="p4_y" onclick="copyCode('p4_y')">⧉ Copy</button>
       <pre id="p4_y">
 %{
-#include <stdio.h>
-#include <stdlib.h>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 struct entry {
     char op, arg1, arg2, result;
 } table[20];
@@ -524,8 +524,8 @@ char addEntry(char arg1, char arg2, char op){
 }
 %}
 %union { char sym; }
-%token <sym> LETTER NUMBER
-%type  <sym> expr
+%token &lt;sym&gt; LETTER NUMBER
+%type  &lt;sym&gt; expr
 %left  '+' '-'
 %right '*' '/'
 %%
@@ -629,16 +629,16 @@ int yywrap(){ return 1; }
       <button class="copy-btn" data-copy="p5_y" onclick="copyCode('p5_y')">⧉ Copy</button>
       <pre id="p5_y">
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
 void yyerror(const char *s);
 int yylex();
 %}
 %union { char *id; int num; char *str; }
-%token <id>  ID
-%token <num> NUM
-%token <str> STRING
+%token &lt;id&gt;  ID
+%token &lt;num&gt; NUM
+%token &lt;str&gt; STRING
 %token INT MAIN PRINTF ADD LPAREN RPAREN SEMI COMMA LBRACE RBRACE ASSIGN RETURN
 %start program
 %%
