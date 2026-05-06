@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compiler Design — LEX &amp; YACC Programs</title>
+  <title>CNS Programs — Computer Networks & Security</title>
+  <meta name="description" content="CNS lab programs including CRC error detection and more. Clean, copy-ready C++ code.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Inter', sans-serif;
       background: #0a0f1e;
@@ -14,38 +16,81 @@
       min-height: 100vh;
       padding: 30px 20px 60px;
     }
-    h1 {
+
+    /* ── Header ── */
+    .header-wrap {
       text-align: center;
-      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+    .badge-top {
+      display: inline-block;
+      font-size: 0.72rem;
       font-weight: 700;
-      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #0e4a6e, #2d1a5e);
+      color: #94a3b8;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      border: 1px solid #1e293b;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
     }
     .subtitle {
-      text-align: center;
       color: #64748b;
       font-size: 0.9rem;
-      margin-bottom: 36px;
     }
+
+    /* ── Container ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── Accordion ── */
     .accordion {
       background: #111827;
       border: 1px solid #1e293b;
-      border-radius: 12px;
-      margin-bottom: 14px;
+      border-radius: 14px;
+      margin-bottom: 16px;
       overflow: hidden;
-      transition: box-shadow 0.3s;
+      transition: box-shadow 0.3s, border-color 0.3s;
     }
-    .accordion:hover { box-shadow: 0 0 0 1px #38bdf855; }
+    .accordion:hover {
+      border-color: #38bdf855;
+      box-shadow: 0 0 0 1px #38bdf833, 0 4px 24px #0003;
+    }
     .accordion-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 20px;
+      padding: 18px 22px;
       cursor: pointer;
       user-select: none;
       gap: 12px;
+    }
+    .acc-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+    .acc-num {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #38bdf8;
+      background: #0e4a6e33;
+      border: 1px solid #38bdf840;
+      border-radius: 8px;
+      padding: 2px 10px;
+      white-space: nowrap;
     }
     .acc-title {
       font-size: 1rem;
@@ -58,10 +103,12 @@
       padding: 3px 10px;
       border-radius: 20px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
-    .badge-lex  { background: #0e4a6e; color: #38bdf8; }
-    .badge-yacc { background: #2d1a5e; color: #818cf8; }
-    .badge-both { background: #1a3a1a; color: #4ade80; }
+    .badge-cpp  { background: #1a2e1a; color: #4ade80; }
+    .badge-c    { background: #1a2540; color: #60a5fa; }
+    .badge-py   { background: #2d1a5e; color: #818cf8; }
+
     .acc-arrow {
       font-size: 1.1rem;
       color: #38bdf8;
@@ -69,12 +116,28 @@
       flex-shrink: 0;
     }
     .accordion.open .acc-arrow { transform: rotate(180deg); }
+
+    /* ── Body ── */
     .accordion-body {
       display: none;
-      padding: 0 20px 20px;
+      padding: 0 22px 22px;
       border-top: 1px solid #1e293b;
+      animation: fadeSlide 0.25s ease;
     }
     .accordion.open .accordion-body { display: block; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .desc {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 14px;
+      line-height: 1.6;
+    }
+
     .section-label {
       font-size: 0.78rem;
       font-weight: 700;
@@ -83,6 +146,8 @@
       color: #38bdf8;
       margin: 18px 0 6px;
     }
+
+    /* ── Copy button ── */
     .copy-btn {
       display: inline-flex;
       align-items: center;
@@ -91,618 +156,595 @@
       color: #94a3b8;
       border: 1px solid #334155;
       border-radius: 6px;
-      padding: 4px 12px;
+      padding: 5px 14px;
       font-size: 0.78rem;
+      font-family: 'Inter', sans-serif;
       cursor: pointer;
-      margin-bottom: 6px;
-      transition: background 0.2s, color 0.2s;
+      margin-bottom: 8px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
-    .copy-btn:hover { background: #38bdf8; color: #0a0f1e; }
+    .copy-btn:hover { background: #38bdf8; color: #0a0f1e; border-color: #38bdf8; }
+
+    /* ── Code block ── */
     pre {
       font-family: 'Fira Code', monospace;
       font-size: 0.82rem;
       background: #020617;
       border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 16px;
+      border-radius: 10px;
+      padding: 18px;
       overflow-x: auto;
-      line-height: 1.6;
+      line-height: 1.65;
       color: #a5f3fc;
       white-space: pre;
     }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      color: #334155;
+      font-size: 0.8rem;
+    }
+    footer span { color: #38bdf8; }
   </style>
+
   <script>
     function toggleAcc(id) {
-      const el = document.getElementById(id);
-      el.classList.toggle('open');
+      document.getElementById(id).classList.toggle('open');
     }
     function copyCode(id) {
       const text = document.getElementById(id).innerText;
       navigator.clipboard.writeText(text).then(() => {
         const btn = document.querySelector('[data-copy="' + id + '"]');
-        if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '⧉ Copy', 1500); }
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = '✓ Copied!';
+          btn.style.background = '#4ade80';
+          btn.style.color = '#022c22';
+          btn.style.borderColor = '#4ade80';
+          setTimeout(() => {
+            btn.textContent = orig;
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+          }, 1500);
+        }
       });
     }
   </script>
 </head>
 
 <body>
-  <h1>Compiler Design — LEX &amp; YACC</h1>
-  <p class="subtitle">Corrected &amp; Verified · Click any title to expand</p>
-
-  <!-- PROGRAM 1a -->
-  <div class="accordion" id="acc1a">
-    <div class="accordion-header" onclick="toggleAcc('acc1a')">
-      <span class="acc-title">Program 1a — LEX: Count Words, Lines, Characters &amp; Whitespaces</span>
-      <span class="acc-badge badge-lex">LEX</span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code</p>
-      <button class="copy-btn" data-copy="p1a" onclick="copyCode('p1a')">⧉ Copy</button>
-      <pre id="p1a">
-%{
-#include&lt;stdio.h&gt;
-int lines=1, spaces=0, words=0, characters=0;
-%}
-%%
-[ ]           { spaces++; }
-[\t]          { spaces = spaces + 3; }
-[\n]          { lines++; }
-[a-zA-Z]+    { words++; characters = characters + yyleng; }
-#             { return 0; }
-%%
-int yywrap(){
-    return 1;
-}
-int main(){
-    printf("Enter a paragraph (end with #):\n");
-    yylex();
-    printf("Lines=%d, Spaces=%d, Words=%d, Characters=%d\n",
-            lines, spaces, words, characters);
-    return 0;
-}
-} </pre>
-    </div>
+  <div class="header-wrap">
+    <div class="badge-top">VTU · CNS Lab</div>
+    <h1>Computer Networks &amp; Security</h1>
+    <p class="subtitle">Lab Programs · C++ · Click any title to expand &amp; copy</p>
   </div>
 
-  <!-- PROGRAM 1b -->
-  <div class="accordion" id="acc1b">
-    <div class="accordion-header" onclick="toggleAcc('acc1b')">
-      <span class="acc-title">Program 1b — YACC: Recognize strings a&#x207F; b&#x207F;&#x207A;&#x1D50; c&#x1D50;</span>
-      <span class="acc-badge badge-both">LEX + YACC</span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code</p>
-      <button class="copy-btn" data-copy="p1b_l" onclick="copyCode('p1b_l')">⧉ Copy</button>
-    <pre id="p1b_l">
-%{
-#include "y.tab.h"
-%}
-%%
-'a'    { return 'a'; }
-'b'    { return 'b'; }
-'c'    { return 'c'; }
-.      { return yytext[0]; }
-[\n]   { return 0; }
-%%
-</pre>
-      <p class="section-label">YACC Code</p>
-      <button class="copy-btn" data-copy="p1b_y" onclick="copyCode('p1b_y')">⧉ Copy</button>
-      <pre id="p1b_y">
-%{
-#include&lt;stdio.h&gt;
-#include&lt;string.h&gt;
-void yyerror(char const *s);
-%}
-%start S
-%%
-S : A B ;
-A : 'a' A 'b' | /* empty */ ;
-B : 'b' B 'c' | /* empty */ ;
-%%
-int main(){
-    printf("Enter string:\n");
-    yyparse();
-    printf("Valid\n");
-    return 0;
+  <div class="container">
+
+    <!-- PROGRAM 1 — CRC -->
+    <div class="accordion" id="acc1">
+      <div class="accordion-header" onclick="toggleAcc('acc1')">
+        <div class="acc-left">
+          <span class="acc-num">Prog 1</span>
+          <span class="acc-title">CRC — Cyclic Redundancy Check (CRC-CCITT)</span>
+        </div>
+        <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p class="desc">
+          Implements CRC-CCITT (polynomial <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">10001000000100001</code>) for error detection.
+          Pads data with 16 zeros, computes the checksum via binary division, appends it to form a codeword,
+          and optionally introduces a bit error to verify detection.
+        </p>
+        <p class="section-label">C++ Source Code</p>
+        <button class="copy-btn" data-copy="p1_crc" onclick="copyCode('p1_crc')">⧉ Copy</button>
+        <pre id="p1_crc">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+string poly = "10001000000100001"; // CRC-CCITT polynomial
+
+string xorOp(string a, string b) {
+    string result = "";
+    for (int i = 0; i &lt; (int)b.length(); i++)
+        result += (a[i] == b[i]) ? '0' : '1';
+    return result;
 }
-void yyerror(char const *s){
-    fprintf(stderr, "Invalid\n");
-    exit(0);
-}
-</pre>
-    </div>
-  </div>
 
-  <!-- PROGRAM 2a -->
-  <div class="accordion" id="acc2a">
-    <div class="accordion-header" onclick="toggleAcc('acc2a')">
-      <span class="acc-title">Program 2a — LEX: Count Positive/Negative Integers &amp; Fractions</span>
-      <span class="acc-badge badge-lex">LEX</span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code</p>
-      <button class="copy-btn" data-copy="p2a" onclick="copyCode('p2a')">⧉ Copy</button>
-      <pre id="p2a">
-%{
-#include&lt;stdio.h&gt;
-int nf=0,pf=0,p=0,n=0;
-%}
-%%
-[+]?[0-9]+[.][0-9]+ { pf++; }
-[-][0-9]+[.][0-9]+ { nf++; }
-[+]?[0-9]+[/][+]?[0-9]+ { pf++; }
-[-][0-9]+[/][+]?[0-9]+ { nf++; }
-[+]?[0-9]+[/][-][0-9]+ { nf++; }
-[-][0-9]+[/][-][0-9]+ { pf++; }
-[+]?[0-9]+ { p++; }
-[-][0-9]+ { n++; }
-# { return 0; }
-[ \t\n] { }
-. { }
-%%
-int yywrap(){ return 1; }
+string crcDivide(string data) {
+    int plen = poly.length();
+    string rem = data.substr(0, plen);
 
-int main(){
-printf("Enter numbers (# to end):\n");
-yylex();
-printf("Positive integers: %d\n",p);
-printf("Negative integers: %d\n",n);
-printf("Positive fractions: %d\n",pf);
-printf("Negative fractions: %d\n",nf);
-} </pre>
-    </div>
-  </div>
+    for (int i = plen; i &lt;= (int)data.length(); i++) {
+        if (rem[0] == '1')
+            rem = xorOp(rem, poly);
+        else
+            rem = xorOp(rem, string(plen, '0'));
 
-  <!-- PROGRAM 2b -->
-  <div class="accordion" id="acc2b">
-    <div class="accordion-header" onclick="toggleAcc('acc2b')">
-      <span class="acc-title">Program 2b — YACC: Validate &amp; Evaluate Arithmetic Expressions</span>
-      <span class="acc-badge badge-both">LEX + YACC</span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code</p>
-      <button class="copy-btn" data-copy="p2b_l" onclick="copyCode('p2b_l')">⧉ Copy</button>
-      <pre id="p2b_l">
-%{
-#include "y.tab.h"
-extern YYSTYPE yylval;
-%}
-%%
-[0-9]+ { yylval = atoi(yytext); return NUM; }
-[-+*/()] { return yytext[0]; }
-[ \t] { }
-\n { return 0; }
-. { return yytext[0]; }
-%%
-</pre>
-      <p class="section-label">YACC Code</p>
-      <button class="copy-btn" data-copy="p2b_y" onclick="copyCode('p2b_y')">⧉ Copy</button>
-      <pre id="p2b_y">
-%{
-#include&lt;stdio.h&gt;
-#include&lt;stdlib.h&gt;
-void yyerror(const char *s);
-int yylex(void);
-%}
-%token NUM
-%left '+' '-'
-%left '*' '/'
-%%
-S : I { printf("Result = %d\n",$1); };
-
-I : I '+' I { $$=$1+$3; }
-| I '-' I { $$=$1-$3; }
-| I '/' I { if($3==0) yyerror("Divide by zero"); else $$=$1/$3; }
-| I '*' I { $$=$1*$3; }
-| '(' I ')' { $$=$2; }
-| NUM { $$=$1; }
-| '-' NUM { $$=-$2; }
-;
-%%
-int main(){
-printf("Enter expression:\n");
-yyparse();
-printf("Valid\n");
-return 0;
-}
-void yyerror(const char *s){
-printf("Invalid: %s\n",s);
-exit(0);
-} </pre>
-    </div>
-  </div>
-
-  <!-- PROGRAM 3a -->
-  <div class="accordion" id="acc3a">
-    <div class="accordion-header" onclick="toggleAcc('acc3a')">
-      <span class="acc-title">Program 3a — YACC: Recognize Nested FOR Loop (min 3 levels)</span>
-      <span class="acc-badge badge-both">LEX + YACC</span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code</p>
-      <button class="copy-btn" data-copy="p3a_l" onclick="copyCode('p3a_l')">⧉ Copy</button>
-      <pre id="p3a_l">
-%{
-#include "y.tab.h"
-%}
-%%
-"for"   { return FOR; }
-"("     { return LPAREN; }
-")"     { return RPAREN; }
-"{"     { return LF; }
-"}"     { return RF; }
-"=="    { return EQ; }
-"<="    { return LE; }
-">="    { return GE; }
-"+="    { return ADDEQ; }
-"-="    { return SUBEQ; }
-"++"    { return INC; }
-"--"    { return DEC; }
-"="     { return '='; }
-"-"     { return '-'; }
-"+"     { return '+'; }
-">"     { return '>'; }
-"<"     { return '<'; }
-";"     { return ';'; }
-[a-zA-Z]+  { return ALPH; }
-[0-9]+     { return NUM; }
-[ \t\n]    { /* ignore */ }
-"#"        { return 0; }
-.          { /* ignore */ }
-%%
-int yywrap(){ return 1; }
-</pre>
-      <p class="section-label">YACC Code</p>
-      <button class="copy-btn" data-copy="p3a_y" onclick="copyCode('p3a_y')">⧉ Copy</button>
-      <pre id="p3a_y">
-%{
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-int yylex();
-int count = 0;
-int yyerror();
-%}
-%token FOR LPAREN RPAREN LF RF ALPH NUM EQ LE GE ADDEQ SUBEQ INC DEC
-%%
-S : forlist ;
-forlist : I | forlist I ;
-I : FOR A B  { count++; } ;
-A : LPAREN E ';' E ';' E RPAREN ;
-E : ALPH Z NUM
-  | ALPH Z ALPH
-  | ALPH U
-  | /* empty */
-  ;
-Z : '=' | '>' | '<' | LE | GE | EQ | ADDEQ | SUBEQ ;
-U : INC | DEC ;
-B : LF body RF ;
-body : /* empty */
-     | body I
-     | body ALPH ';'
-     ;
-%%
-int main(){
-    printf("Enter for loop(s) followed by #:\n");
-    yyparse();
-    if(count < 3){
-        printf("Invalid: minimum 3 nesting levels required (found %d)\n", count);
-    } else {
-        printf("Valid — number of FOR loops: %d\n", count);
+        if (i &lt; (int)data.length())
+            rem = rem.substr(1) + data[i];
+        else
+            rem = rem.substr(1);
     }
-    return 0;
+    return rem;
 }
-int yyerror(){
-    printf("Invalid\n");
-    exit(0);
-}
-</pre>
-    </div>
-  </div>
 
-  <!-- PROGRAM 3b -->
-  <div class="accordion" id="acc3b">
-    <div class="accordion-header" onclick="toggleAcc('acc3b')">
-      <span class="acc-title">Program 3b — YACC: Recognize C Declaration Statements &amp; Count Variables</span>
-      <span class="acc-badge badge-both">LEX + YACC</span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code</p>
-      <button class="copy-btn" data-copy="p3b_l" onclick="copyCode('p3b_l')">⧉ Copy</button>
-      <pre id="p3b_l">
-%{
-#include "y.tab.h"
-%}
-%%
-"int"                    { return INT; }
-"float"                  { return FLOAT; }
-"char"                   { return CHAR; }
-"double"                 { return DOUBLE; }
-[a-zA-Z_][a-zA-Z0-9_]*  { return IDENTIFIER; }
-[0-9]+                   { return NUM; }
-"["                      { return '['; }
-"]"                      { return ']'; }
-","                      { return ','; }
-";"                      { return ';'; }
-[ \t\n]                  { /* ignore whitespace */ }
-"#"                      { return 0; }
-%%
-int yywrap(){ return 1; }
-</pre>
-      <p class="section-label">YACC Code</p>
-      <button class="copy-btn" data-copy="p3b_y" onclick="copyCode('p3b_y')">⧉ Copy</button>
-      <pre id="p3b_y">
-%{
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-int var_count = 0;
-void yyerror(const char *s);
-int yylex();
-%}
-%token INT FLOAT CHAR DOUBLE NUM IDENTIFIER
-%%
-program : declarations ;
-declarations : declaration ';'
-             | declarations declaration ';'
-             ;
-declaration : type var_list ;
-type : INT | FLOAT | CHAR | DOUBLE ;
-var_list : var
-         | var_list ',' var
-         ;
-var : identifier
-    | identifier '[' ']'
-    | identifier '[' NUM ']'
-    ;
-identifier : IDENTIFIER  { var_count++; } ;
-%%
-void yyerror(const char *s){
-    fprintf(stderr, "Error: %s\n", s);
-}
-int main(){
-    printf("Enter declaration(s) followed by #:\n");
-    yyparse();
-    printf("Total variables declared: %d\n", var_count);
-    return 0;
-}
-</pre>
-    </div>
-  </div>
+int main() {
+    string data;
+    cout &lt;&lt; "Enter data: ";
+    cin &gt;&gt; data;
 
-  <!-- PROGRAM 4 -->
-  <div class="accordion" id="acc4">
-    <div class="accordion-header" onclick="toggleAcc('acc4')">
-      <span class="acc-title">Program 4 — Three Address Code (Quadruple &amp; Triple Representation)</span>
-      <span class="acc-badge badge-both">LEX + YACC</span>
-      <span class="acc-arrow">▼</span>
+    // Pad 16 zeros
+    string padded = data + string(poly.length() - 1, '0');
+    cout &lt;&lt; "Modified data  : " &lt;&lt; padded &lt;&lt; endl;
+
+    // Get checksum
+    string checksum = crcDivide(padded);
+    cout &lt;&lt; "Checksum       : " &lt;&lt; checksum &lt;&lt; endl;
+
+    // Final codeword
+    string codeword = data + checksum;
+    cout &lt;&lt; "Final codeword : " &lt;&lt; codeword &lt;&lt; endl;
+
+    // Error detection test
+    int choice;
+    cout &lt;&lt; "\nTest error detection? 0(yes) 1(no): ";
+    cin &gt;&gt; choice;
+
+    if (choice == 0) {
+        int pos;
+        cout &lt;&lt; "Enter error position (1-indexed): ";
+        cin &gt;&gt; pos;
+        codeword[pos - 1] = (codeword[pos - 1] == '0') ? '1' : '0';
+        cout &lt;&lt; "Erroneous data : " &lt;&lt; codeword &lt;&lt; endl;
+    }
+
+    // Check for error
+    string remainder = crcDivide(codeword);
+    bool error = (remainder.find('1') != string::npos);
+    cout &lt;&lt; (error ? "Error detected" : "No error detected") &lt;&lt; endl;
+
+    return 0;
+}</pre>
+      </div>
     </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code (prog4.l)</p>
-      <button class="copy-btn" data-copy="p4_l" onclick="copyCode('p4_l')">⧉ Copy</button>
-      <pre id="p4_l">
-%{
-#include "y.tab.h"
-extern YYSTYPE yylval;
-%}
-%%
-[0-9]+     { yylval.sym = yytext[0]; return NUMBER; }
-[a-zA-Z]+  { yylval.sym = yytext[0]; return LETTER; }
-\n         { return 0; }
-.          { return yytext[0]; }
-%%
-int yywrap(){ return 1; }
-</pre>
-      <p class="section-label">YACC Code (prog4.y)</p>
-      <button class="copy-btn" data-copy="p4_y" onclick="copyCode('p4_y')">⧉ Copy</button>
-      <pre id="p4_y">
-%{
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-struct entry {
-    char op, arg1, arg2, result;
-} table[20];
-int idx  = 0;
-int flag = 0;
-int tnum = 1;   /* temp counter: T1, T2, ... */
-char newTemp(){
-    return (char)('0' + tnum++);
-}
-char addEntry(char arg1, char arg2, char op){
-    char t = newTemp();
-    table[idx].op     = op;
-    table[idx].arg1   = arg1;
-    table[idx].arg2   = arg2;
-    table[idx].result = t;
-    idx++;
-    return t;
-}
-%}
-%union { char sym; }
-%token &lt;sym&gt; LETTER NUMBER
-%type  &lt;sym&gt; expr
-%left  '+' '-'
-%right '*' '/'
-%%
-statement : LETTER '=' expr ';'
-            {
-                table[idx].op     = '=';
-                table[idx].arg1   = $3;
-                table[idx].arg2   = ' ';
-                table[idx].result = $1;
-                idx++;
+    <!-- End Program 1 -->
+
+    <!-- PROGRAM 2 — Leaky Bucket -->
+    <div class="accordion" id="acc2">
+      <div class="accordion-header" onclick="toggleAcc('acc2')">
+        <div class="acc-left">
+          <span class="acc-num">Prog 2</span>
+          <span class="acc-title">Leaky Bucket — Traffic Shaping Algorithm</span>
+        </div>
+        <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p class="desc">
+          Simulates the <strong style="color:#e2e8f0;">Leaky Bucket</strong> congestion-control algorithm.
+          Packets fill a bucket of fixed capacity; the bucket drains at a constant output rate each time unit.
+          Excess packets that overflow the bucket are dropped, ensuring a smooth, regulated output stream.
+        </p>
+        <p class="section-label">C++ Source Code</p>
+        <button class="copy-btn" data-copy="p2_lb" onclick="copyCode('p2_lb')">⧉ Copy</button>
+        <pre id="p2_lb">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int bucketSize, outputRate, bucket = 0;
+
+    cout &lt;&lt; "Enter output rate: ";
+    cin &gt;&gt; outputRate;
+    cout &lt;&lt; "Enter bucket size: ";
+    cin &gt;&gt; bucketSize;
+
+    while (true) {
+        int incoming;
+        cout &lt;&lt; "Incoming packet: ";
+        cin &gt;&gt; incoming;
+
+        if (incoming == 0) {
+            cout &lt;&lt; "Transmission left: 0" &lt;&lt; endl;
+            int next;
+            cout &lt;&lt; "Next packet will come at: ";
+            cin &gt;&gt; next;
+            continue;
+        }
+
+        // Overflow check
+        if (bucket + incoming &gt; bucketSize) {
+            cout &lt;&lt; "Packet dropped! Overflow. Accepting only: " &lt;&lt; bucketSize - bucket &lt;&lt; endl;
+            incoming = bucketSize - bucket;
+        }
+
+        bucket += incoming;
+        cout &lt;&lt; "Transmission left: " &lt;&lt; bucket &lt;&lt; endl;
+
+        int timeLeft;
+        cout &lt;&lt; "Next packet will come at: ";
+        cin &gt;&gt; timeLeft;
+
+        // Countdown from timeLeft
+        while (timeLeft &gt; 0) {
+            if (bucket &gt; 0) {
+                bucket -= outputRate;
+                if (bucket &lt; 0) bucket = 0;
+                cout &lt;&lt; "Time left " &lt;&lt; timeLeft &lt;&lt; "--------No packets to transmit!! Transmitted" &lt;&lt; endl;
+                cout &lt;&lt; "Bytes remaining: " &lt;&lt; bucket &lt;&lt; endl;
+            } else {
+                cout &lt;&lt; "Time left " &lt;&lt; timeLeft &lt;&lt; "--------No packets to transmit!!" &lt;&lt; endl;
             }
-          | expr ';'
-          ;
-expr : expr '+' expr  { $$ = addEntry($1, $3, '+'); }
-     | expr '-' expr  { $$ = addEntry($1, $3, '-'); }
-     | expr '*' expr  { $$ = addEntry($1, $3, '*'); }
-     | expr '/' expr  { $$ = addEntry($1, $3, '/'); }
-     | '(' expr ')'   { $$ = $2; }
-     | NUMBER          { $$ = $1; }
-     | LETTER          { $$ = $1; }
-     ;
-%%
-void printCode(){
-    printf("\n=== Three-Address Code ===\n");
-    for(int i = 0; i < idx; i++){
-        if(table[i].op == '=')
-            printf("%c = %c\n", table[i].result, table[i].arg1);
-        else
-            printf("T%d = %c %c %c\n", i+1, table[i].arg1, table[i].op, table[i].arg2);
+            timeLeft--;
+        }
     }
-    printf("\n=== Quadruple (Index, Op, Arg1, Arg2, Result) ===\n");
-    printf("%-6s %-5s %-5s %-5s %-6s\n","Index","Op","Arg1","Arg2","Result");
-    for(int i = 0; i < idx; i++){
-        if(table[i].op == '=')
-            printf("%-6d %-5c %-5c %-5s %-6c\n", i, table[i].op, table[i].arg1, "-", table[i].result);
-        else
-            printf("%-6d %-5c %-5c %-5c T%-5d\n", i, table[i].op, table[i].arg1, table[i].arg2, i+1);
+
+    return 0;
+}</pre>
+      </div>
+    </div>
+    <!-- End Program 2 -->
+
+    <!-- PROGRAM 3 — Caesar & Playfair -->
+    <div class="accordion" id="acc3">
+      <div class="accordion-header" onclick="toggleAcc('acc3')">
+        <div class="acc-left">
+          <span class="acc-num">Prog 3</span>
+          <span class="acc-title">Caesar &amp; Playfair — Classical Encryption Ciphers</span>
+        </div>
+        <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p class="desc">
+          Implements two classical substitution ciphers in a single program.
+          <strong style="color:#e2e8f0;">Caesar Cipher</strong> shifts each letter by a fixed amount (supports any shift value, auto-wraps).
+          <strong style="color:#e2e8f0;">Playfair Cipher</strong> uses a 5×5 key matrix with I/J merged; handles digraph rules (same row, same column, rectangle).
+          Both support encrypt and decrypt modes.
+        </p>
+        <p class="section-label">C++ Source Code</p>
+        <button class="copy-btn" data-copy="p3_cipher" onclick="copyCode('p3_cipher')">⧉ Copy</button>
+        <pre id="p3_cipher">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;cctype&gt;
+#include &lt;limits&gt;
+using namespace std;
+
+string caesar(const string&amp; text, int shift, bool encrypt) {
+    string out;
+    shift = ((shift % 26) + 26) % 26;
+    if (!encrypt) shift = (26 - shift) % 26;
+    for (char ch : text) {
+        if (!isalpha((unsigned char)ch)) { out += ch; continue; }
+        char b = isupper((unsigned char)ch) ? 'A' : 'a';
+        out += char(b + (ch - b + shift) % 26);
     }
-    printf("\n=== Triple (Index, Op, Arg1, Arg2) ===\n");
-    printf("%-6s %-5s %-5s %-5s\n","Index","Op","Arg1","Arg2");
-    for(int i = 0; i < idx; i++)
-        printf("%-6d %-5c %-5c %-5c\n", i, table[i].op, table[i].arg1, table[i].arg2);
+    return out;
 }
-int main(){
-    printf("Enter expression (e.g.  a = b + c * d; ):\n");
-    yyparse();
-    if(!flag) printCode();
-    return 0;
-}
-int yyerror(char *s){
-    flag = 1;
-    printf("Error: %s\n", s);
-    return 0;
-}
-</pre>
-    </div>
-  </div>
 
-  <!-- PROGRAM 5 -->
-  <div class="accordion" id="acc5">
-    <div class="accordion-header" onclick="toggleAcc('acc5')">
-      <span class="acc-title">Program 5 — Generate x86 Assembly (Target) Code</span>
-      <span class="acc-badge badge-both">LEX + YACC</span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="accordion-body">
-      <p class="section-label">LEX Code (prog5.l)</p>
-      <button class="copy-btn" data-copy="p5_l" onclick="copyCode('p5_l')">⧉ Copy</button>
-      <pre id="p5_l">
-%{
-#include "y.tab.h"
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-%}
-DIGIT   [0-9]
-ID      [a-zA-Z_][a-zA-Z0-9_]*
-WS      [ \t\n]
-STR     \"[^"]*\"
-%%
-"int"       { return INT; }
-"return"    { return RETURN; }
-"printf"    { return PRINTF; }
-"main"      { return MAIN; }
-{STR}       { yylval.str = strdup(yytext); return STRING; }
-{ID}        { yylval.id  = strdup(yytext); return ID; }
-{DIGIT}+    { yylval.num = atoi(yytext);   return NUM; }
-"+"         { return ADD; }
-"="         { return ASSIGN; }
-"("         { return LPAREN; }
-")"         { return RPAREN; }
-";"         { return SEMI; }
-","         { return COMMA; }
-"{"         { return LBRACE; }
-"}"         { return RBRACE; }
-{WS}        { /* ignore */ }
-.           { /* ignore */ }
-%%
-int yywrap(){ return 1; }
-</pre>
-      <p class="section-label">YACC Code (prog5.y)</p>
-      <button class="copy-btn" data-copy="p5_y" onclick="copyCode('p5_y')">⧉ Copy</button>
-      <pre id="p5_y">
-%{
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-void yyerror(const char *s);
-int yylex();
-%}
-%union { char *id; int num; char *str; }
-%token &lt;id&gt;  ID
-%token &lt;num&gt; NUM
-%token &lt;str&gt; STRING
-%token INT MAIN PRINTF ADD LPAREN RPAREN SEMI COMMA LBRACE RBRACE ASSIGN RETURN
-%start program
-%%
-program
-    : INT MAIN LPAREN RPAREN LBRACE
-      {
-          printf(".data\n");
-          printf("  .LC0: .string \"Sum %%d\\n\"\n");
-          printf(".text\n");
-          printf("  .globl main\n");
-          printf("main:\n");
-          printf("  push %%ebp\n");
-          printf("  movl %%esp, %%ebp\n");
-      }
-      stmt_list RBRACE
-      {
-          printf("  movl $0, %%eax\n");
-          printf("  pop %%ebp\n");
-          printf("  ret\n");
-      }
-    ;
-stmt_list
-    : stmt
-    | stmt_list stmt
-    ;
-stmt
-    : INT idlist SEMI
-      { /* declarations — no code emitted */ }
-    | ID ASSIGN NUM SEMI
-      { printf("  movl $%d, -%s\n", $3, $1); }
-    | ID ASSIGN ID ADD ID SEMI
-      {
-          printf("  movl -%s, %%eax\n", $3);
-          printf("  addl -%s, %%eax\n", $5);
-          printf("  movl %%eax, -%s\n", $1);
-      }
-    | PRINTF LPAREN STRING COMMA ID RPAREN SEMI
-      {
-          printf("  movl -%s, %%eax\n", $5);
-          printf("  pushl %%eax\n");
-          printf("  pushl $.LC0\n");
-          printf("  call printf\n");
-          printf("  addl $8, %%esp\n");
-      }
-    | RETURN NUM SEMI
-      { /* handled in program rule */ }
-    ;
-idlist
-    : ID
-    | idlist COMMA ID
-    ;
-%%
-void yyerror(const char *s){
-    fprintf(stderr, "Error: %s\n", s);
-    exit(1);
-}
-int main(){
-    printf("Assembly code output:\n");
-    yyparse();
-    return 0;
-}
-</pre>
-    </div>
-  </div>
+struct Playfair {
+    char g[5][5];
+    int r[26] = {}, c[26] = {};
 
+    static char norm(char ch) {
+        if (!isalpha((unsigned char)ch)) return '\0';
+        ch = char(toupper((unsigned char)ch));
+        return ch == 'J' ? 'I' : ch;
+    }
+
+    static string clean(const string&amp; text) {
+        string s;
+        for (char ch : text) {
+            char n = norm(ch);
+            if (n) s += n;
+        }
+        return s;
+    }
+
+    void build(const string&amp; key) {
+        bool used[26] = {};
+        used['J' - 'A'] = true;
+        string seq;
+        for (char ch : key) {
+            char n = norm(ch);
+            if (n &amp;&amp; !used[n - 'A']) used[n - 'A'] = true, seq += n;
+        }
+        for (char ch = 'A'; ch &lt;= 'Z'; ch++) if (!used[ch - 'A']) seq += ch;
+        for (int i = 0; i &lt; 25; i++) g[i / 5][i % 5] = seq[i], r[seq[i] - 'A'] = i / 5, c[seq[i] - 'A'] = i % 5;
+    }
+
+    string prep(const string&amp; text, bool encrypt) {
+        string s = clean(text), out;
+        if (!encrypt) {
+            if (s.size() % 2) s += 'X';
+            return s;
+        }
+        for (size_t i = 0; i &lt; s.size();) {
+            char a = s[i], b = (i + 1 &lt; s.size()) ? s[i + 1] : 'X';
+            if (a == b) out += a, out += 'X', i += 1;
+            else out += a, out += b, i += 2;
+        }
+        if (out.size() % 2) out += 'X';
+        return out;
+    }
+
+    string run(const string&amp; text, bool encrypt) {
+        string p = prep(text, encrypt), out;
+        int d = encrypt ? 1 : 4;
+        for (size_t i = 0; i &lt; p.size(); i += 2) {
+            int r1 = r[p[i] - 'A'], c1 = c[p[i] - 'A'];
+            int r2 = r[p[i + 1] - 'A'], c2 = c[p[i + 1] - 'A'];
+            if (r1 == r2) out += g[r1][(c1 + d) % 5], out += g[r2][(c2 + d) % 5];
+            else if (c1 == c2) out += g[(r1 + d) % 5][c1], out += g[(r2 + d) % 5][c2];
+            else out += g[r1][c2], out += g[r2][c1];
+        }
+        return out;
+    }
+};
+
+int main() {
+    int ch, mode;
+    string text;
+    cout &lt;&lt; "1. Caesar 2. Playfair: ";
+    if (!(cin &gt;&gt; ch) || (ch != 1 &amp;&amp; ch != 2)) return 1;
+    cin.ignore(numeric_limits&lt;streamsize&gt;::max(), '\n');
+
+    cout &lt;&lt; "Text: "; getline(cin, text);
+    cout &lt;&lt; "1 = Encrypt 2 = Decrypt: ";
+    if (!(cin &gt;&gt; mode) || (mode != 1 &amp;&amp; mode != 2)) return 1;
+    cin.ignore(numeric_limits&lt;streamsize&gt;::max(), '\n');
+
+    if (ch == 1) {
+        int shift;
+        cout &lt;&lt; "Shift: ";
+        if (!(cin &gt;&gt; shift)) return 1;
+        cout &lt;&lt; caesar(text, shift, mode == 1) &lt;&lt; "\n";
+    } else {
+        string key;
+        cout &lt;&lt; "Key: "; getline(cin, key);
+        Playfair pf; pf.build(key);
+        cout &lt;&lt; pf.run(text, mode == 1) &lt;&lt; "\n";
+    }
+}</pre>
+      </div>
+    </div>
+    <!-- End Program 3 -->
+
+    <!-- PROGRAM 4 — Vigenere -->
+    <div class="accordion" id="acc4">
+      <div class="accordion-header" onclick="toggleAcc('acc4')">
+        <div class="acc-left">
+          <span class="acc-num">Prog 4</span>
+          <span class="acc-title">Vigenère Cipher — Polyalphabetic Substitution</span>
+        </div>
+        <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p class="desc">
+          Implements the <strong style="color:#e2e8f0;">Vigenère Cipher</strong>, a polyalphabetic substitution cipher.
+          Each character is shifted by an amount determined by the corresponding letter of a repeating keyword,
+          making it significantly stronger than Caesar. Supports both encrypt and decrypt modes; non-alpha characters pass through unchanged.
+        </p>
+        <p class="section-label">C++ Source Code</p>
+        <button class="copy-btn" data-copy="p4_vig" onclick="copyCode('p4_vig')">⧉ Copy</button>
+        <pre id="p4_vig">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+string vigenere(const string&amp; text, const string&amp; key, bool encrypt) {
+    string out;
+    int j = 0;
+    for (char ch : text) {
+        if (!isalpha(ch)) { out += ch; continue; }
+        char b = isupper(ch) ? 'A' : 'a';
+        int shift = toupper(key[j % key.size()]) - 'A';
+        if (!encrypt) shift = 26 - shift;
+        out += char(b + (ch - b + shift) % 26);
+        j++;
+    }
+    return out;
+}
+
+int main() {
+    int mode;
+    string text, key;
+    cout &lt;&lt; "Text: "; getline(cin, text);
+    cout &lt;&lt; "Key: "; getline(cin, key);
+    cout &lt;&lt; "1=Encrypt 2=Decrypt: "; cin &gt;&gt; mode;
+    cout &lt;&lt; vigenere(text, key, mode == 1) &lt;&lt; "\n";
+}</pre>
+      </div>
+    </div>
+    <!-- End Program 4 -->
+
+    <!-- PROGRAM 5 — RSA -->
+    <div class="accordion" id="acc5">
+      <div class="accordion-header" onclick="toggleAcc('acc5')">
+        <div class="acc-left">
+          <span class="acc-num">Prog 5</span>
+          <span class="acc-title">RSA — Public Key Encryption &amp; Decryption</span>
+        </div>
+        <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p class="desc">
+          Implements the <strong style="color:#e2e8f0;">RSA asymmetric cryptosystem</strong>.
+          Takes two primes <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">p</code> and
+          <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">q</code>, computes
+          <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">n = p×q</code> and
+          <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">φ(n)</code>,
+          derives private key <em>d</em> via extended Euclidean algorithm, then encrypts/decrypts text using modular exponentiation.
+        </p>
+        <p class="section-label">C++ Source Code</p>
+        <button class="copy-btn" data-copy="p5_rsa" onclick="copyCode('p5_rsa')">⧉ Copy</button>
+        <pre id="p5_rsa">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+using ll = long long;
+
+ll mod_pow(ll base, ll exp, ll mod) {
+    ll result = 1;
+    base %= mod;
+    while (exp &gt; 0) {
+        if (exp &amp; 1) result = result * base % mod;
+        base = base * base % mod;
+        exp &gt;&gt;= 1;
+    }
+    return result;
+}
+
+ll gcd(ll a, ll b) { return b == 0 ? a : gcd(b, a % b); }
+
+ll mod_inverse(ll e, ll phi) {
+    ll t = 0, new_t = 1, r = phi, new_r = e;
+    while (new_r != 0) {
+        ll q = r / new_r;
+        t -= q * new_t; swap(t, new_t);
+        r -= q * new_r; swap(r, new_r);
+    }
+    return t &lt; 0 ? t + phi : t;
+}
+
+bool is_prime(ll n) {
+    if (n &lt; 2) return false;
+    for (ll i = 2; i * i &lt;= n; i++)
+        if (n % i == 0) return false;
+    return true;
+}
+
+int main() {
+    ll p, q;
+    cout &lt;&lt; "Enter prime p: "; cin &gt;&gt; p;
+    cout &lt;&lt; "Enter prime q: "; cin &gt;&gt; q;
+
+    if (!is_prime(p) || !is_prime(q)) {
+        cout &lt;&lt; "Both must be prime!\n"; return 1;
+    }
+
+    ll n = p * q;
+    ll phi = (p - 1) * (q - 1);
+
+    ll e;
+    cout &lt;&lt; "Enter public exponent e (coprime to " &lt;&lt; phi &lt;&lt; "): "; cin &gt;&gt; e;
+
+    if (gcd(e, phi) != 1) {
+        cout &lt;&lt; "e must be coprime to phi!\n"; return 1;
+    }
+
+    ll d = mod_inverse(e, phi);
+
+    cout &lt;&lt; "\n";
+    cout &lt;&lt; "Public key:  (e=" &lt;&lt; e &lt;&lt; ", n=" &lt;&lt; n &lt;&lt; ")\n";
+    cout &lt;&lt; "Private key: (d=" &lt;&lt; d &lt;&lt; ", n=" &lt;&lt; n &lt;&lt; ")\n\n";
+
+    cin.ignore();
+    int mode;
+    cout &lt;&lt; "1=Encrypt 2=Decrypt: "; cin &gt;&gt; mode; cin.ignore();
+
+    if (mode == 1) {
+        string text;
+        cout &lt;&lt; "Plaintext: "; getline(cin, text);
+        cout &lt;&lt; "Encrypted: ";
+        for (char ch : text)
+            cout &lt;&lt; mod_pow(ch, e, n) &lt;&lt; " ";
+        cout &lt;&lt; "\n";
+    } else {
+        string line;
+        cout &lt;&lt; "Ciphertext (space-separated numbers): ";
+        getline(cin, line);
+        cout &lt;&lt; "Decrypted: ";
+        size_t pos = 0;
+        while (pos &lt; line.size()) {
+            size_t next = line.find(' ', pos);
+            if (next == string::npos) next = line.size();
+            ll val = stoll(line.substr(pos, next - pos));
+            cout &lt;&lt; char(mod_pow(val, d, n));
+            pos = next + 1;
+        }
+        cout &lt;&lt; "\n";
+    }
+}</pre>
+      </div>
+    </div>
+    <!-- End Program 5 -->
+
+    <!-- PROGRAM 6 — Diffie-Hellman -->
+    <div class="accordion" id="acc6">
+      <div class="accordion-header" onclick="toggleAcc('acc6')">
+        <div class="acc-left">
+          <span class="acc-num">Prog 6</span>
+          <span class="acc-title">Diffie-Hellman — Key Exchange Protocol</span>
+        </div>
+        <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p class="desc">
+          Simulates the <strong style="color:#e2e8f0;">Diffie-Hellman Key Exchange</strong> over a public prime
+          <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">p</code> and generator
+          <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">g</code>.
+          Alice and Bob each pick private keys, exchange public values
+          <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">A = g<sup>a</sup> mod p</code> and
+          <code style="color:#f472b6;background:#1e0a2e;padding:1px 6px;border-radius:4px;">B = g<sup>b</sup> mod p</code>,
+          then independently compute the same shared secret using modular exponentiation.
+        </p>
+        <p class="section-label">C++ Source Code</p>
+        <button class="copy-btn" data-copy="p6_dh" onclick="copyCode('p6_dh')">⧉ Copy</button>
+        <pre id="p6_dh">#include &lt;iostream&gt;
+using namespace std;
+using ll = long long;
+
+ll mod_pow(ll base, ll exp, ll mod) {
+    ll result = 1;
+    base %= mod;
+    while (exp &gt; 0) {
+        if (exp &amp; 1) result = result * base % mod;
+        base = base * base % mod;
+        exp &gt;&gt;= 1;
+    }
+    return result;
+}
+
+int main() {
+    ll p, g, a, b;
+    cout &lt;&lt; "Enter prime (p): "; cin &gt;&gt; p;
+    cout &lt;&lt; "Enter generator (g): "; cin &gt;&gt; g;
+    cout &lt;&lt; "Alice's private key (a): "; cin &gt;&gt; a;
+    cout &lt;&lt; "Bob's private key (b): "; cin &gt;&gt; b;
+
+    ll A = mod_pow(g, a, p);
+    ll B = mod_pow(g, b, p);
+
+    cout &lt;&lt; "\nAlice sends: A = g^a mod p = " &lt;&lt; A &lt;&lt; "\n";
+    cout &lt;&lt; "Bob sends:   B = g^b mod p = " &lt;&lt; B &lt;&lt; "\n";
+
+    ll key_alice = mod_pow(B, a, p);
+    ll key_bob   = mod_pow(A, b, p);
+
+    cout &lt;&lt; "\nAlice computes: B^a mod p = " &lt;&lt; key_alice &lt;&lt; "\n";
+    cout &lt;&lt; "Bob computes:   A^b mod p = " &lt;&lt; key_bob   &lt;&lt; "\n";
+
+    if (key_alice == key_bob)
+        cout &lt;&lt; "\nShared secret: " &lt;&lt; key_alice &lt;&lt; "\n";
+    else
+        cout &lt;&lt; "\nError: keys don't match!\n";
+}</pre>
+      </div>
+    </div>
+    <!-- End Program 6 -->
+
+  </div><!-- /.container -->
+
+  <footer>
+    <p>CNS Lab Programs &nbsp;·&nbsp; <span>VTU</span> &nbsp;·&nbsp; Verified &amp; Ready to Use</p>
+  </footer>
 </body>
 </html>
