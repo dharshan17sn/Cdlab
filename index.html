@@ -219,7 +219,7 @@
   <div class="header-wrap">
     <div class="badge-top">VTU · CNS Lab</div>
     <h1>Computer Networks &amp; Security</h1>
-    <p class="subtitle">Lab Programs · C++ · Click any title to expand &amp; copy</p>
+    <p class="subtitle">Lab Programs · C++ &amp; C · Click any title to expand &amp; copy</p>
   </div>
 
   <div class="container">
@@ -232,6 +232,7 @@
           <span class="acc-title">CRC — Cyclic Redundancy Check (CRC-CCITT)</span>
         </div>
         <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-badge badge-c">C</span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
@@ -310,6 +311,86 @@ int main() {
 
     return 0;
 }</pre>
+
+        <p class="section-label" style="margin-top: 30px;">C Source Code</p>
+        <button class="copy-btn" data-copy="p1_crc_c" onclick="copyCode('p1_crc_c')">⧉ Copy</button>
+        <pre id="p1_crc_c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+char poly[] = "10001000000100001";
+
+void xorOp(char* a, const char* b) {
+    for (int i = 0; i &lt; strlen(b); i++) {
+        a[i] = (a[i] == b[i]) ? '0' : '1';
+    }
+}
+
+void crcDivide(const char* data, char* rem) {
+    int plen = strlen(poly);
+    strncpy(rem, data, plen);
+    rem[plen] = '\0';
+    
+    for (int i = plen; i &lt;= strlen(data); i++) {
+        if (rem[0] == '1') {
+            xorOp(rem, poly);
+        } else {
+            char zeros[20] = {0};
+            memset(zeros, '0', plen);
+            xorOp(rem, zeros);
+        }
+        
+        for (int j = 0; j &lt; plen - 1; j++) rem[j] = rem[j + 1];
+        
+        if (i &lt; strlen(data)) {
+            rem[plen - 1] = data[i];
+        } else {
+            rem[plen - 1] = '\0';
+        }
+    }
+}
+
+int main() {
+    char data[100], padded[120], checksum[20], codeword[120];
+    printf("Enter data: ");
+    scanf("%s", data);
+
+    strcpy(padded, data);
+    for(int i = 0; i &lt; strlen(poly) - 1; i++) strcat(padded, "0");
+    printf("Modified data  : %s\n", padded);
+
+    crcDivide(padded, checksum);
+    printf("Checksum       : %s\n", checksum);
+
+    strcpy(codeword, data);
+    strcat(codeword, checksum);
+    printf("Final codeword : %s\n", codeword);
+
+    int choice;
+    printf("\nTest error detection? 0(yes) 1(no): ");
+    scanf("%d", &amp;choice);
+
+    if (choice == 0) {
+        int pos;
+        printf("Enter error position (1-indexed): ");
+        scanf("%d", &amp;pos);
+        codeword[pos - 1] = (codeword[pos - 1] == '0') ? '1' : '0';
+        printf("Erroneous data : %s\n", codeword);
+    }
+
+    char remainder[20];
+    crcDivide(codeword, remainder);
+    
+    int error = 0;
+    for (int i = 0; i &lt; strlen(remainder); i++) {
+        if (remainder[i] == '1') {
+            error = 1;
+            break;
+        }
+    }
+    printf("%s\n", error ? "Error detected" : "No error detected");
+
+    return 0;
+}</pre>
       </div>
     </div>
     <!-- End Program 1 -->
@@ -322,6 +403,7 @@ int main() {
           <span class="acc-title">Leaky Bucket — Traffic Shaping Algorithm</span>
         </div>
         <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-badge badge-c">C</span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
@@ -385,6 +467,59 @@ int main() {
 
     return 0;
 }</pre>
+
+        <p class="section-label" style="margin-top: 30px;">C Source Code</p>
+        <button class="copy-btn" data-copy="p2_lb_c" onclick="copyCode('p2_lb_c')">⧉ Copy</button>
+        <pre id="p2_lb_c">#include &lt;stdio.h&gt;
+
+int main() {
+    int bucketSize, outputRate, bucket = 0;
+
+    printf("Enter output rate: ");
+    scanf("%d", &amp;outputRate);
+    printf("Enter bucket size: ");
+    scanf("%d", &amp;bucketSize);
+
+    while (1) {
+        int incoming;
+        printf("Incoming packet: ");
+        scanf("%d", &amp;incoming);
+
+        if (incoming == 0) {
+            printf("Transmission left: 0\n");
+            int next;
+            printf("Next packet will come at: ");
+            scanf("%d", &amp;next);
+            continue;
+        }
+
+        if (bucket + incoming &gt; bucketSize) {
+            printf("Packet dropped! Overflow. Accepting only: %d\n", bucketSize - bucket);
+            incoming = bucketSize - bucket;
+        }
+
+        bucket += incoming;
+        printf("Transmission left: %d\n", bucket);
+
+        int timeLeft;
+        printf("Next packet will come at: ");
+        scanf("%d", &amp;timeLeft);
+
+        while (timeLeft &gt; 0) {
+            if (bucket &gt; 0) {
+                bucket -= outputRate;
+                if (bucket &lt; 0) bucket = 0;
+                printf("Time left %d --------No packets to transmit!! Transmitted\n", timeLeft);
+                printf("Bytes remaining: %d\n", bucket);
+            } else {
+                printf("Time left %d --------No packets to transmit!!\n", timeLeft);
+            }
+            timeLeft--;
+        }
+    }
+
+    return 0;
+}</pre>
       </div>
     </div>
     <!-- End Program 2 -->
@@ -397,6 +532,7 @@ int main() {
           <span class="acc-title">Caesar &amp; Playfair — Classical Encryption Ciphers</span>
         </div>
         <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-badge badge-c">C</span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
@@ -510,6 +646,128 @@ int main() {
         cout &lt;&lt; pf.run(text, mode == 1) &lt;&lt; "\n";
     }
 }</pre>
+
+        <p class="section-label" style="margin-top: 30px;">C Source Code</p>
+        <button class="copy-btn" data-copy="p3_cipher_c" onclick="copyCode('p3_cipher_c')">⧉ Copy</button>
+        <pre id="p3_cipher_c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+void caesar(const char* text, int shift, int encrypt, char* out) {
+    shift = ((shift % 26) + 26) % 26;
+    if (!encrypt) shift = (26 - shift) % 26;
+    int j = 0;
+    for (int i = 0; text[i]; i++) {
+        if (!isalpha(text[i])) { out[j++] = text[i]; continue; }
+        char b = isupper(text[i]) ? 'A' : 'a';
+        out[j++] = b + (text[i] - b + shift) % 26;
+    }
+    out[j] = '\0';
+}
+
+char g[5][5];
+int pr[26], pc[26];
+
+char norm(char ch) {
+    if (!isalpha(ch)) return '\0';
+    ch = toupper(ch);
+    return ch == 'J' ? 'I' : ch;
+}
+
+void build(const char* key) {
+    int used[26] = {0};
+    used['J' - 'A'] = 1;
+    char seq[26];
+    int len = 0;
+    for (int i = 0; key[i]; i++) {
+        char n = norm(key[i]);
+        if (n &amp;&amp; !used[n - 'A']) { used[n - 'A'] = 1; seq[len++] = n; }
+    }
+    for (char ch = 'A'; ch &lt;= 'Z'; ch++) if (!used[ch - 'A']) seq[len++] = ch;
+    for (int i = 0; i &lt; 25; i++) {
+        g[i / 5][i % 5] = seq[i];
+        pr[seq[i] - 'A'] = i / 5;
+        pc[seq[i] - 'A'] = i % 5;
+    }
+}
+
+void run(const char* text, int encrypt, char* out) {
+    char s[1000];
+    int len = 0;
+    for (int i = 0; text[i]; i++) {
+        char n = norm(text[i]);
+        if (n) s[len++] = n;
+    }
+    s[len] = '\0';
+    
+    char p[2000];
+    int plen = 0;
+    if (!encrypt) {
+        strcpy(p, s);
+        plen = len;
+        if (plen % 2) { p[plen++] = 'X'; p[plen] = '\0'; }
+    } else {
+        for (int i = 0; i &lt; len; ) {
+            char a = s[i];
+            char b = (i + 1 &lt; len) ? s[i + 1] : 'X';
+            if (a == b) { p[plen++] = a; p[plen++] = 'X'; i += 1; }
+            else { p[plen++] = a; p[plen++] = b; i += 2; }
+        }
+        if (plen % 2) { p[plen++] = 'X'; }
+        p[plen] = '\0';
+    }
+    
+    int d = encrypt ? 1 : 4;
+    int out_len = 0;
+    for (int i = 0; i &lt; plen; i += 2) {
+        int r1 = pr[p[i] - 'A'], c1 = pc[p[i] - 'A'];
+        int r2 = pr[p[i + 1] - 'A'], c2 = pc[p[i + 1] - 'A'];
+        if (r1 == r2) {
+            out[out_len++] = g[r1][(c1 + d) % 5];
+            out[out_len++] = g[r2][(c2 + d) % 5];
+        } else if (c1 == c2) {
+            out[out_len++] = g[(r1 + d) % 5][c1];
+            out[out_len++] = g[(r2 + d) % 5][c2];
+        } else {
+            out[out_len++] = g[r1][c2];
+            out[out_len++] = g[r2][c1];
+        }
+    }
+    out[out_len] = '\0';
+}
+
+int main() {
+    int ch, mode;
+    char text[1000], out[2000];
+    printf("1. Caesar 2. Playfair: ");
+    if (scanf("%d", &amp;ch) != 1 || (ch != 1 &amp;&amp; ch != 2)) return 1;
+    getchar();
+
+    printf("Text: ");
+    fgets(text, sizeof(text), stdin);
+    text[strcspn(text, "\n")] = 0;
+
+    printf("1 = Encrypt 2 = Decrypt: ");
+    if (scanf("%d", &amp;mode) != 1 || (mode != 1 &amp;&amp; mode != 2)) return 1;
+    getchar();
+
+    if (ch == 1) {
+        int shift;
+        printf("Shift: ");
+        if (scanf("%d", &amp;shift) != 1) return 1;
+        caesar(text, shift, mode == 1, out);
+        printf("%s\n", out);
+    } else {
+        char key[100];
+        printf("Key: ");
+        fgets(key, sizeof(key), stdin);
+        key[strcspn(key, "\n")] = 0;
+        build(key);
+        run(text, mode == 1, out);
+        printf("%s\n", out);
+    }
+    return 0;
+}</pre>
       </div>
     </div>
     <!-- End Program 3 -->
@@ -522,6 +780,7 @@ int main() {
           <span class="acc-title">Vigenère Cipher — Polyalphabetic Substitution</span>
         </div>
         <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-badge badge-c">C</span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
@@ -558,6 +817,45 @@ int main() {
     cout &lt;&lt; "1=Encrypt 2=Decrypt: "; cin &gt;&gt; mode;
     cout &lt;&lt; vigenere(text, key, mode == 1) &lt;&lt; "\n";
 }</pre>
+
+        <p class="section-label" style="margin-top: 30px;">C Source Code</p>
+        <button class="copy-btn" data-copy="p4_vig_c" onclick="copyCode('p4_vig_c')">⧉ Copy</button>
+        <pre id="p4_vig_c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+void vigenere(const char* text, const char* key, int encrypt, char* out) {
+    int j = 0, len = strlen(key);
+    int out_len = 0;
+    for (int i = 0; text[i]; i++) {
+        if (!isalpha(text[i])) { out[out_len++] = text[i]; continue; }
+        char b = isupper(text[i]) ? 'A' : 'a';
+        int shift = toupper(key[j % len]) - 'A';
+        if (!encrypt) shift = 26 - shift;
+        out[out_len++] = b + (text[i] - b + shift) % 26;
+        j++;
+    }
+    out[out_len] = '\0';
+}
+
+int main() {
+    int mode;
+    char text[1000], key[100], out[1000];
+    printf("Text: ");
+    fgets(text, sizeof(text), stdin);
+    text[strcspn(text, "\n")] = 0;
+    
+    printf("Key: ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = 0;
+    
+    printf("1=Encrypt 2=Decrypt: ");
+    scanf("%d", &amp;mode);
+    
+    vigenere(text, key, mode == 1, out);
+    printf("%s\n", out);
+    return 0;
+}</pre>
       </div>
     </div>
     <!-- End Program 4 -->
@@ -570,6 +868,7 @@ int main() {
           <span class="acc-title">RSA — Public Key Encryption &amp; Decryption</span>
         </div>
         <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-badge badge-c">C</span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
@@ -672,6 +971,98 @@ int main() {
         cout &lt;&lt; "\n";
     }
 }</pre>
+
+        <p class="section-label" style="margin-top: 30px;">C Source Code</p>
+        <button class="copy-btn" data-copy="p5_rsa_c" onclick="copyCode('p5_rsa_c')">⧉ Copy</button>
+        <pre id="p5_rsa_c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef long long ll;
+
+ll mod_pow(ll base, ll exp, ll mod) {
+    ll result = 1;
+    base %= mod;
+    while (exp &gt; 0) {
+        if (exp &amp; 1) result = result * base % mod;
+        base = base * base % mod;
+        exp &gt;&gt;= 1;
+    }
+    return result;
+}
+
+ll gcd(ll a, ll b) { return b == 0 ? a : gcd(b, a % b); }
+
+ll mod_inverse(ll e, ll phi) {
+    ll t = 0, new_t = 1, r = phi, new_r = e;
+    while (new_r != 0) {
+        ll q = r / new_r;
+        ll temp;
+        temp = t - q * new_t; t = new_t; new_t = temp;
+        temp = r - q * new_r; r = new_r; new_r = temp;
+    }
+    return t &lt; 0 ? t + phi : t;
+}
+
+int is_prime(ll n) {
+    if (n &lt; 2) return 0;
+    for (ll i = 2; i * i &lt;= n; i++)
+        if (n % i == 0) return 0;
+    return 1;
+}
+
+int main() {
+    ll p, q;
+    printf("Enter prime p: "); scanf("%lld", &amp;p);
+    printf("Enter prime q: "); scanf("%lld", &amp;q);
+
+    if (!is_prime(p) || !is_prime(q)) {
+        printf("Both must be prime!\n"); return 1;
+    }
+
+    ll n = p * q;
+    ll phi = (p - 1) * (q - 1);
+
+    ll e;
+    printf("Enter public exponent e (coprime to %lld): ", phi); scanf("%lld", &amp;e);
+
+    if (gcd(e, phi) != 1) {
+        printf("e must be coprime to phi!\n"); return 1;
+    }
+
+    ll d = mod_inverse(e, phi);
+
+    printf("\nPublic key:  (e=%lld, n=%lld)\n", e, n);
+    printf("Private key: (d=%lld, n=%lld)\n\n", d, n);
+
+    while(getchar() != '\n');
+    int mode;
+    printf("1=Encrypt 2=Decrypt: "); scanf("%d", &amp;mode);
+    while(getchar() != '\n');
+
+    if (mode == 1) {
+        char text[1000];
+        printf("Plaintext: "); fgets(text, sizeof(text), stdin);
+        text[strcspn(text, "\n")] = 0;
+        printf("Encrypted: ");
+        for (int i = 0; text[i]; i++)
+            printf("%lld ", mod_pow(text[i], e, n));
+        printf("\n");
+    } else {
+        char line[2000];
+        printf("Ciphertext (space-separated numbers): ");
+        fgets(line, sizeof(line), stdin);
+        printf("Decrypted: ");
+        char* token = strtok(line, " \n");
+        while (token != NULL) {
+            ll val = atoll(token);
+            printf("%c", (char)mod_pow(val, d, n));
+            token = strtok(NULL, " \n");
+        }
+        printf("\n");
+    }
+    return 0;
+}</pre>
       </div>
     </div>
     <!-- End Program 5 -->
@@ -684,6 +1075,7 @@ int main() {
           <span class="acc-title">Diffie-Hellman — Key Exchange Protocol</span>
         </div>
         <span class="acc-badge badge-cpp">C++</span>
+        <span class="acc-badge badge-c">C</span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
@@ -736,6 +1128,50 @@ int main() {
         cout &lt;&lt; "\nShared secret: " &lt;&lt; key_alice &lt;&lt; "\n";
     else
         cout &lt;&lt; "\nError: keys don't match!\n";
+}</pre>
+
+        <p class="section-label" style="margin-top: 30px;">C Source Code</p>
+        <button class="copy-btn" data-copy="p6_dh_c" onclick="copyCode('p6_dh_c')">⧉ Copy</button>
+        <pre id="p6_dh_c">#include &lt;stdio.h&gt;
+
+typedef long long ll;
+
+ll mod_pow(ll base, ll exp, ll mod) {
+    ll result = 1;
+    base %= mod;
+    while (exp &gt; 0) {
+        if (exp &amp; 1) result = result * base % mod;
+        base = base * base % mod;
+        exp &gt;&gt;= 1;
+    }
+    return result;
+}
+
+int main() {
+    ll p, g, a, b;
+    printf("Enter prime (p): "); scanf("%lld", &amp;p);
+    printf("Enter generator (g): "); scanf("%lld", &amp;g);
+    printf("Alice's private key (a): "); scanf("%lld", &amp;a);
+    printf("Bob's private key (b): "); scanf("%lld", &amp;b);
+
+    ll A = mod_pow(g, a, p);
+    ll B = mod_pow(g, b, p);
+
+    printf("\nAlice sends: A = g^a mod p = %lld\n", A);
+    printf("Bob sends:   B = g^b mod p = %lld\n", B);
+
+    ll key_alice = mod_pow(B, a, p);
+    ll key_bob   = mod_pow(A, b, p);
+
+    printf("\nAlice computes: B^a mod p = %lld\n", key_alice);
+    printf("Bob computes:   A^b mod p = %lld\n", key_bob);
+
+    if (key_alice == key_bob)
+        printf("\nShared secret: %lld\n", key_alice);
+    else
+        printf("\nError: keys don't match!\n");
+        
+    return 0;
 }</pre>
       </div>
     </div>
