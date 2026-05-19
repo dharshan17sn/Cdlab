@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConfigAware — AI-Powered Dead Feature Detector | LLVM Analysis</title>
+  <meta name="description" content="Futuristic AI-powered compiler analysis dashboard for detecting dead features in large C/C++ codebases using LLVM whole-program analysis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Animated background grid -->
+<div class="bg-grid"></div>
+<div class="bg-particles" id="particles"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><span>⚙</span></div>
+    <div class="logo-text">
+      <span class="logo-main">ConfigAware</span>
+      <span class="logo-sub">LLVM Dead Feature Detector</span>
+    </div>
+  </div>
+  <div class="sidebar-status">
+    <div class="status-dot pulse"></div>
+    <span>Analysis Engine Active</span>
+  </div>
+  <ul class="nav-links">
+    <li class="nav-item active" data-tab="overview">
+      <span class="nav-icon">◈</span><span>Overview</span>
+    </li>
+    <li class="nav-item" data-tab="build-config">
+      <span class="nav-icon">⚒</span><span>Build Config Extractor</span>
+    </li>
+    <li class="nav-item" data-tab="llvm-analysis">
+      <span class="nav-icon">◉</span><span>LLVM Analysis</span>
+    </li>
+    <li class="nav-item" data-tab="dead-features">
+      <span class="nav-icon">☠</span><span>Dead Feature Report</span>
+    </li>
+    <li class="nav-item" data-tab="evaluation">
+      <span class="nav-icon">◇</span><span>Evaluation & Metrics</span>
+    </li>
+    <li class="nav-item" data-tab="terminal">
+      <span class="nav-icon">▶</span><span>LLVM Terminal</span>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="build-info">
+      <span>LLVM 17.0.6</span>
+      <span class="sep">|</span>
+      <span>Clang 17</span>
+    </div>
+    <div class="build-info">
+      <span>Analysis v2.4.1</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Main content -->
+<main class="main-content">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+      <div class="breadcrumb">
+        <span class="bc-root">ConfigAware</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-current" id="breadcrumbCurrent">Overview</span>
+      </div>
+    </div>
+    <div class="topbar-center">
+      <div class="analysis-bar">
+        <div class="ab-label">Global Analysis</div>
+        <div class="ab-progress">
+          <div class="ab-fill" id="globalProgress"></div>
+        </div>
+        <div class="ab-pct" id="globalPct">87%</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="stat-pill"><span class="sp-num" id="tp-dead">142</span><span class="sp-lbl">Dead Flags</span></div>
+      <div class="stat-pill green"><span class="sp-num" id="tp-live">389</span><span class="sp-lbl">Live Flags</span></div>
+      <button class="sample-btn" id="loadSampleBtn" title="Load built-in sample C++ project">📦 Load Sample</button>
+      <button class="run-btn" id="runAnalysisBtn">▶ Run Analysis</button>
+    </div>
+  </header>
+
+  <!-- TAB: Overview -->
+  <section class="tab-content active" id="tab-overview">
+    <div class="section-header">
+      <h1>Dead Feature Analysis Overview</h1>
+      <p>AI-powered whole-program analysis of C/C++ feature flags using LLVM IR and interprocedural dataflow</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card red" id="kpi1">
+        <div class="kpi-icon">☠</div>
+        <div class="kpi-body">
+          <div class="kpi-value" data-target="142">0</div>
+          <div class="kpi-label">Dead Feature Flags</div>
+          <div class="kpi-trend">▼ 23 this week</div>
+        </div>
+        <div class="kpi-sparkline" id="spark1"></div>
+      </div>
+      <div class="kpi-card cyan" id="kpi2">
+        <div class="kpi-icon">◈</div>
+        <div class="kpi-body">
+          <div class="kpi-value" data-target="38420">0</div>
+          <div class="kpi-label">Removable Lines</div>
+          <div class="kpi-trend">▼ 12.4% of codebase</div>
+        </div>
+        <div class="kpi-sparkline" id="spark2"></div>
+      </div>
+      <div class="kpi-card purple" id="kpi3">
+        <div class="kpi-icon">⬡</div>
+        <div class="kpi-body">
+          <div class="kpi-value" data-target="2.4">0</div>
+          <div class="kpi-label">Binary Size Reduction (MB)</div>
+          <div class="kpi-trend">▼ 18.7% smaller</div>
+        </div>
+        <div class="kpi-sparkline" id="spark3"></div>
+      </div>
+      <div class="kpi-card green" id="kpi4">
+        <div class="kpi-icon">◉</div>
+        <div class="kpi-body">
+          <div class="kpi-value" data-target="94.2">0</div>
+          <div class="kpi-label">Analysis Confidence %</div>
+          <div class="kpi-trend">▲ High precision</div>
+        </div>
+        <div class="kpi-sparkline" id="spark4"></div>
+      </div>
+    </div>
+
+    <!-- Overview grid -->
+    <div class="overview-grid">
+      <!-- Pipeline visualization -->
+      <div class="glass-card span2" id="pipeline-card">
+        <div class="card-header">
+          <h3>Analysis Pipeline</h3>
+          <div class="card-badge">LIVE</div>
+        </div>
+        <div class="pipeline-flow" id="pipelineFlow"></div>
+      </div>
+
+      <!-- Donut chart -->
+      <div class="glass-card" id="donut-card">
+        <div class="card-header"><h3>Feature Flag Distribution</h3></div>
+        <canvas id="featureDonut" height="220"></canvas>
+      </div>
+
+      <!-- Recent findings -->
+      <div class="glass-card span2" id="findings-card">
+        <div class="card-header">
+          <h3>Recent Dead Feature Findings</h3>
+          <div class="card-badge yellow">142 Found</div>
+        </div>
+        <div class="findings-list" id="findingsList"></div>
+      </div>
+
+      <!-- Confidence gauge -->
+      <div class="glass-card" id="gauge-card">
+        <div class="card-header"><h3>AI Confidence Score</h3></div>
+        <div class="gauge-wrap">
+          <canvas id="gaugeCanvas" width="220" height="140"></canvas>
+          <div class="gauge-value">94.2%</div>
+          <div class="gauge-label">High Confidence</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: Build Config -->
+  <section class="tab-content" id="tab-build-config">
+    <div class="section-header">
+      <h1>Build Configuration Extractor</h1>
+      <p>CMake/Makefile parsing, compile_commands.json analysis, and #define extraction</p>
+    </div>
+    <div class="two-col">
+      <!-- Left: file tree + parser -->
+      <div class="col-left">
+        <div class="glass-card">
+          <div class="card-header"><h3>Project File Tree</h3><div class="card-badge">Scanned</div></div>
+          <div class="file-tree" id="fileTree"></div>
+        </div>
+        <div class="glass-card mt">
+          <div class="card-header"><h3>compile_commands.json Analysis</h3></div>
+          <div class="json-viewer" id="jsonViewer"></div>
+        </div>
+      </div>
+      <!-- Right: define combinations -->
+      <div class="col-right">
+        <div class="glass-card">
+          <div class="card-header"><h3>#define Combinations Extracted</h3><div class="card-badge cyan">531 Flags</div></div>
+          <div class="define-search"><input type="text" placeholder="Filter flags..." id="defineSearch" /><span>⌕</span></div>
+          <div class="define-table-wrap">
+            <table class="define-table" id="defineTable">
+              <thead><tr><th>Flag</th><th>Value</th><th>Files</th><th>Status</th><th>Conf.</th></tr></thead>
+              <tbody id="defineTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="glass-card mt">
+          <div class="card-header"><h3>CMake/Makefile Parser Log</h3></div>
+          <div class="parser-log" id="parserLog"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: LLVM Analysis -->
+  <section class="tab-content" id="tab-llvm-analysis">
+    <div class="section-header">
+      <h1>LLVM Whole-Program Analysis</h1>
+      <p>IR generation, CFG reachability, interprocedural dataflow, and LTO-based flow visualization</p>
+    </div>
+
+    <div class="llvm-grid">
+      <!-- IR Viewer -->
+      <div class="glass-card span2">
+        <div class="card-header">
+          <h3>LLVM IR Viewer</h3>
+          <div class="ir-tabs">
+            <button class="ir-tab active" data-ir="ll">.ll Source</button>
+            <button class="ir-tab" data-ir="bc">.bc Bitcode</button>
+            <button class="ir-tab" data-ir="passes">Pass Log</button>
+          </div>
+        </div>
+        <div class="ir-editor" id="irEditor"></div>
+      </div>
+
+      <!-- CFG Graph -->
+      <div class="glass-card span3">
+        <div class="card-header">
+          <h3>Control Flow Graph — Reachability</h3>
+          <div class="cfg-legend">
+            <span class="leg green">● Reachable</span>
+            <span class="leg red">● Dead</span>
+            <span class="leg gray">● Unreachable</span>
+          </div>
+        </div>
+        <svg id="cfgGraph" width="100%" height="420"></svg>
+      </div>
+
+      <!-- Interprocedural -->
+      <div class="glass-card span2">
+        <div class="card-header"><h3>Interprocedural Analysis — Call Graph</h3></div>
+        <svg id="callGraph" width="100%" height="320"></svg>
+      </div>
+
+      <!-- LTO Flow -->
+      <div class="glass-card">
+        <div class="card-header"><h3>LTO Whole-Program Flow</h3></div>
+        <canvas id="ltoChart" height="300"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: Dead Features -->
+  <section class="tab-content" id="tab-dead-features">
+    <div class="section-header">
+      <h1>Dead Feature Report</h1>
+      <p>Confidence scores, source regions, highlighted dead code, runtime toggles, dependency graphs</p>
+    </div>
+    <div class="dead-grid">
+      <!-- Code Editor -->
+      <div class="glass-card span2 code-card">
+        <div class="card-header">
+          <h3>C++ Source — Dead Code Highlighted</h3>
+          <div class="editor-tabs" id="editorTabs"></div>
+        </div>
+        <div class="editor-gutter" id="editorGutter"></div>
+        <div class="monaco-editor" id="monacoEditor"></div>
+      </div>
+
+      <!-- Dead features list -->
+      <div class="glass-card">
+        <div class="card-header"><h3>Dead Flags</h3><div class="card-badge red">142</div></div>
+        <div class="dead-list" id="deadList"></div>
+      </div>
+
+      <!-- Dependency graph -->
+      <div class="glass-card span2">
+        <div class="card-header"><h3>Feature Dependency Graph</h3></div>
+        <svg id="depGraph" width="100%" height="340"></svg>
+      </div>
+
+      <!-- Runtime toggles -->
+      <div class="glass-card">
+        <div class="card-header"><h3>Runtime Toggle Analysis</h3></div>
+        <div class="toggle-list" id="toggleList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: Evaluation -->
+  <section class="tab-content" id="tab-evaluation">
+    <div class="section-header">
+      <h1>Evaluation & Estimation</h1>
+      <p>Binary size reduction, LOC metrics, feature heatmaps, and performance analytics</p>
+    </div>
+    <div class="eval-grid">
+      <div class="glass-card span2">
+        <div class="card-header"><h3>LOC Removability Analysis</h3></div>
+        <canvas id="locChart" height="260"></canvas>
+      </div>
+      <div class="glass-card">
+        <div class="card-header"><h3>Binary Size Before vs After</h3></div>
+        <canvas id="binaryChart" height="260"></canvas>
+      </div>
+      <div class="glass-card span3">
+        <div class="card-header"><h3>Feature Flag Heatmap</h3></div>
+        <div id="heatmapContainer"></div>
+      </div>
+      <div class="glass-card span2">
+        <div class="card-header"><h3>Performance Impact Forecast</h3></div>
+        <canvas id="perfChart" height="240"></canvas>
+      </div>
+      <div class="glass-card">
+        <div class="card-header"><h3>Removal Stats</h3></div>
+        <div class="stat-list" id="statList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: Terminal -->
+  <section class="tab-content" id="tab-terminal">
+    <div class="section-header">
+      <h1>LLVM Pass Execution Terminal</h1>
+      <p>Real-time compiler pass output, optimization logs, and analysis trace</p>
+    </div>
+    <div class="terminal-layout">
+      <div class="terminal-panel" id="terminalPanel">
+        <div class="term-header">
+          <span class="term-dot red"></span>
+          <span class="term-dot yellow"></span>
+          <span class="term-dot green"></span>
+          <span class="term-title">llvm-pass-runner — ConfigAware Analysis Engine</span>
+        </div>
+        <div class="term-body" id="termBody"></div>
+        <div class="term-input-row">
+          <span class="term-prompt">$&nbsp;</span>
+          <input type="text" class="term-input" id="termInput" placeholder="Enter LLVM command..." />
+        </div>
+      </div>
+      <div class="terminal-sidebar">
+        <div class="glass-card">
+          <div class="card-header"><h3>Pass Registry</h3></div>
+          <div class="pass-list" id="passList"></div>
+        </div>
+        <div class="glass-card mt">
+          <div class="card-header"><h3>Analysis Trace</h3></div>
+          <canvas id="traceChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Running animation overlay -->
+<div class="run-overlay" id="runOverlay">
+  <div class="run-modal">
+    <div class="run-spinner"></div>
+    <div class="run-label" id="runLabel">Initializing LLVM analysis engine...</div>
+    <div class="run-progress-bar"><div class="run-progress-fill" id="runFill"></div></div>
+  </div>
+</div>
+
+<script src="llvm-analysis.js"></script>
+<script src="dead-features.js"></script>
+<script src="evaluation.js"></script>
+<script src="sample-project.js"></script>
+<script src="build-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
