@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -DNDEBUG -shared  -o libDeadFeaturePass.so CMakeFiles/DeadFeaturePass.dir/DeadFeaturePass.cpp.o 
