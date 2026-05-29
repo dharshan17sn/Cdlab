@@ -1,0 +1,7 @@
+/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/src/llvm_passes/build/CMakeFiles/intrinsics_gen.dir
+/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/src/llvm_passes/build/CMakeFiles/omp_gen.dir
+/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/src/llvm_passes/build/CMakeFiles/acc_gen.dir
+/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/src/llvm_passes/build/CMakeFiles/RISCVTargetParserTableGen.dir
+/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/src/llvm_passes/build/CMakeFiles/DeadFeaturePass.dir
+/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/src/llvm_passes/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/src/llvm_passes/build/CMakeFiles/rebuild_cache.dir
