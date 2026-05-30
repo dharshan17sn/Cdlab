@@ -1,62 +1,106 @@
-# Dead Feature Detector
+# Universal Dead Feature Detector
 
-A tool that identifies dead or unreachable features in C/C++ codebases by combining preprocessor macro analysis with LLVM-based whole-program reachability analysis.
+## Overview
+The **Universal Dead Feature Detector** is an advanced static and dynamic analysis tool designed to identify dead, unused, or unreachable features in large-scale C/C++ codebases. By combining preprocessor macro analysis with LLVM-based whole-program reachability tracking, this tool securely identifies code blocks and features that are compiled or configured but never executed.
 
-## What it does
+This tool aims to reduce technical debt, minimize binary size, and improve overall software maintainability by giving engineering teams high-confidence actionable insights regarding obsolete code.
 
-Dead Feature Detector analyzes your repository to find features (code blocks, functions) that are compiled but can never be executed, or features that are entirely disabled by configuration macros but still exist in the codebase. It helps in:
+## Key Features
+- **Language Agnostic (C/C++)**: Compatible with any standard C/C++ repository.
+- **Whole-Program Analysis**: Tracks reachability across the entire binary rather than just isolated files.
+- **Zero-Configuration Execution**: Directly accepts Git URLs to clone, compile, and analyze automatically.
+- **Dynamic Web Interface**: Provides real-time execution tracking and rich visual dashboards for reporting.
+- **High-Confidence Metrics**: Computes exact Lines of Code (LOC) safe for removal and estimates binary reduction size.
 
-- Identifying stale code that can be safely removed.
-- Validating if `#ifdef` blocks are properly managed by `configure` scripts.
-- Reducing technical debt.
+## Architecture & Deliverables
 
-## How it works
+This project directly fulfills the 5 core deliverables outlined for the **Dead Feature Detector for Large C/C++ Codebases** assignment:
 
-1. `run.sh` scans the target project and extracts preprocessor configuration from build files.
-2. The code is compiled into LLVM Bitcode (`.bc`) using the configured compiler and build options.
-3. The LLVM bitcode is linked and passed through the custom `DeadFeaturePass`.
-4. The pass analyzes reachability and outputs a JSON report of dead features, unreachable functions, and disabled code paths.
+1. **Build Configuration Extractor**: Parses build configurations (CMake/Makefile) and header files to enumerate actual `#define` combinations and discover which features are never actively configured.
+2. **LLVM Whole-Program Analysis Pass**: A custom LLVM Compiler Pass that transforms the code into LLVM Intermediate Representation (IR) and performs whole-program reachability tracking, correlating configuration predicates with IR-level dead code blocks.
+3. **Dead Feature Report Generation**: Produces a detailed JSON report and a visual UI breakdown of dead features, assigning them "High Confidence" scores and pinpointing the exact affected source code file and line-number regions (powered by the Preprocessor Guard Mapper).
+4. **Large Open-Source Evaluation**: Includes an automated evaluation pipeline (`evaluate_redis.sh`) that clones, compiles, and evaluates massive real-world projects like Memcached or Redis on the fly.
+5. **Code Volume & Impact Estimation**: Accurately computes the exact Lines of Code (LOC) safe for removal and estimates the immediate binary size reduction achieved by removing the dead features.
+
+*(**Bonus Delivery**): We built an interactive Web Interface (React/Flask) that allows you to paste any Git URL and watch the pipeline execute live, complete with dynamically generated impact charts.*
+
+---
 
 ## Prerequisites
-
-- Linux / WSL
-- Python 3.8+
+- Linux / WSL (Ubuntu recommended)
+- Python 3.8+ (with `python3-venv`)
+- Node.js (v18+) & NPM
 - LLVM 18 (`llvm-18`, `clang-18`)
-- CMake
+- CMake & Make
 
-## Build
+---
 
-Compile the LLVM pass and setup the project:
+## How to Run the Web Interface (Recommended)
+
+The Web Interface provides the best user experience with live streaming and visual charts. It requires running the Backend Server and the Frontend UI simultaneously.
+
+### 1. Start the Backend API
+The backend requires a Python Virtual Environment to serve the analysis pipeline securely.
 
 ```bash
-./build.sh
+# Navigate to the project directory
+cd redis_dead_feature_detector
+
+# Create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies and run the server
+pip install flask flask-cors
+python3 backend/app.py
+```
+*(The server will start on `http://localhost:3001`)*
+
+### 2. Start the Frontend UI
+Open a **new** terminal window (can be standard Windows or WSL).
+
+```bash
+# Navigate to the frontend directory
+cd redis_dead_feature_detector/frontend
+
+# Install dependencies and start the Vite dev server
+npm install
+npm run dev
+```
+*(The UI will open at `http://localhost:5173`. You can now enter any Git URL to begin the analysis).*
+
+---
+
+## How to Run on Terminal (CLI)
+
+If you prefer to run the analysis directly from the command line without the web interface, you can use the evaluation script.
+
+```bash
+cd redis_dead_feature_detector
+
+# Ensure the script is executable
+chmod +x evaluation/evaluate_redis.sh
+
+# Run the script and pass the target Git URL as an argument
+./evaluation/evaluate_redis.sh "https://github.com/memcached/memcached.git"
 ```
 
-## Run the detector
+---
 
-Run the tool against any C project directory or a single C file:
+## Testing & Validation
 
+The project includes several isolated test cases designed to validate specific edge cases of the LLVM pass and guard mapper.
+
+**Available Test Cases:**
+- `tc1_simple_dead_code.c`: Basic unused functions.
+- `tc2_macro_guard.c`: Code blocked by `#ifndef`.
+- `tc3_dead_function.c`: Functions declared but never called.
+- `tc4_alive_feature.c`: Control test ensuring active code is not flagged.
+- `tc5_complex_reachability.c`: Deeply nested unreachable blocks.
+
+**How to run a test case manually:**
 ```bash
-./run.sh /path/to/your/project
-```
-
-Run against a specific testcase:
-
-```bash
+cd redis_dead_feature_detector
 ./run.sh testcases/tc1_simple_dead_code.c
 ```
-
-## Evaluate the Redis case
-
-The repository includes an evaluation script for the Redis detector.
-Make it executable and run it from the `redis_dead_feature_detector` directory:
-
-```bash
-bash -c "chmod +x evaluation/evaluate_redis.sh && evaluation/evaluate_redis.sh"
-```
-
-This will execute the evaluation flow for the Redis analysis and report the results.
-
-## Recommended files for submission
-
-For company submission, keep this README and the implementation files. The additional design/demo/evaluation/implementation markdown files are redundant and can be removed to simplify the package.
+*The resulting JSON report will be generated in `src/dead_feature_reporter/dead_report.json`.*

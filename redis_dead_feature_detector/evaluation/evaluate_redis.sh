@@ -2,16 +2,20 @@
 set -e
 
 echo "================================================="
-echo "    REDIS DEAD FEATURE DETECTOR PIPELINE         "
+echo "       DEAD FEATURE DETECTOR PIPELINE            "
 echo "================================================="
 
 ROOT_DIR=$(pwd)
 TARGET_DIR="$ROOT_DIR/target_repo"
 
-# For your presentation, you can try any of these:
-# GIT_URL="https://github.com/redis/redis.git"
-GIT_URL="https://github.com/memcached/memcached.git"
-# GIT_URL="https://github.com/madler/zlib.git"
+# Accept GIT_URL from command line arguments, fallback to default
+if [ -n "$1" ]; then
+    GIT_URL="$1"
+else
+    GIT_URL="https://github.com/redis/redis.git"
+fi
+
+echo "[*] Using Git URL: $GIT_URL"
 
 echo "[*] Cleaning old repository..."
 rm -rf "$TARGET_DIR"
@@ -21,19 +25,19 @@ git clone --depth 1 "$GIT_URL" "$TARGET_DIR" > /dev/null 2>&1
 
 # 1. Guard Mapper MUST run first to find the universe of features
 echo "[*] Running Preprocessor Guard Mapper..."
-cd "$ROOT_DIR/guard_mapper"
+cd "$ROOT_DIR/src/guard_mapper"
 python3 mapper.py "$TARGET_DIR"
 
 # 2. Config Extractor
 echo "[*] Running Config Extractor..."
-cd "$ROOT_DIR/config_extractor"
+cd "$ROOT_DIR/src/config_extractor"
 # Pass a dummy compile_commands for now, relying on header parsing
 python3 extractor.py "$TARGET_DIR" "dummy.json"
 
 
 # 3. LLVM Pass Compilation
 echo "[*] Compiling LLVM Pass..."
-cd "$ROOT_DIR/llvm_passes"
+cd "$ROOT_DIR/src/llvm_passes"
 mkdir -p build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release > /dev/null
 make -j$(nproc) > /dev/null
@@ -57,7 +61,7 @@ echo "[+] IR Generation complete."
 
 # 5. Reachability Analysis (Running the pass)
 echo "[*] Running Whole-Program Reachability Analysis..."
-cd "$ROOT_DIR/llvm_passes/build"
+cd "$ROOT_DIR/src/llvm_passes/build"
 
 # Create an empty report first
 echo "{\"stats\": {\"dead_functions\": 0, \"dead_instructions\": 0}, \"dead_features\": []}" > ../../dead_feature_reporter/dead_report.json
@@ -76,5 +80,5 @@ else
 fi
 
 # 6. Dead Feature Reporter
-cd "$ROOT_DIR/dead_feature_reporter"
+cd "$ROOT_DIR/src/dead_feature_reporter"
 python3 reporter.py
