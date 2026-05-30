@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/llvm_passes/build",
-  "command": "/usr/bin/c++ -DDeadFeaturePass_EXPORTS -I/usr/lib/llvm-18/include -O3 -DNDEBUG -std=gnu++17 -fPIC   -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o CMakeFiles/DeadFeaturePass.dir/DeadFeaturePass.cpp.o -c /mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/llvm_passes/DeadFeaturePass.cpp",
-  "file": "/mnt/c/Users/dhars/OneDrive/Desktop/cd/redis_dead_feature_detector/llvm_passes/DeadFeaturePass.cpp",
-  "output": "CMakeFiles/DeadFeaturePass.dir/DeadFeaturePass.cpp.o"
-}
-]
